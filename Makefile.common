@@ -16,7 +16,7 @@
 # !!! Open PRs only against the prometheus/prometheus/Makefile.common repository!
 
 # Example usage :
-# Create the main Makefile in the root project directory. 
+# Create the main Makefile in the root project directory.
 # include Makefile.common
 # customTarget:
 # 	@echo ">> Running customTarget"
@@ -36,10 +36,14 @@ pkgs          = ./...
 PREFIX                  ?= $(shell pwd)
 BIN_DIR                 ?= $(shell pwd)
 DOCKER_IMAGE_TAG        ?= $(subst /,-,$(shell git rev-parse --abbrev-ref HEAD))
-DOCKER_REPO             ?= prom
+DOCKER_REPO             ?= jessestuart
+
+GOARCH=amd64
+TARGET=amd64
 
 .PHONY: all
-all: style staticcheck unused build test
+all: build
+# all: style staticcheck unused build test
 
 .PHONY: style
 style:
@@ -99,7 +103,9 @@ tarball: promu
 
 .PHONY: docker
 docker:
-	docker build -t "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)" .
+	docker build \
+		--build-arg target=$(TARGET) \
+		-t "$(DOCKER_REPO)/$(DOCKER_IMAGE_NAME):$(DOCKER_IMAGE_TAG)-$(GOARCH)" .
 
 .PHONY: docker-publish
 docker-publish:
@@ -111,12 +117,12 @@ docker-tag-latest:
 
 .PHONY: promu
 promu:
-	GOOS= GOARCH= $(GO) get -u github.com/prometheus/promu
+	GOOS= GOARCH=$(GOARCH) $(GO) get -u github.com/prometheus/promu
 
 .PHONY: $(STATICCHECK)
 $(STATICCHECK):
-	GOOS= GOARCH= $(GO) get -u honnef.co/go/tools/cmd/staticcheck
+	GOOS= GOARCH=$(GOARCH) $(GO) get -u honnef.co/go/tools/cmd/staticcheck
 
 .PHONY: $(GOVENDOR)
 $(GOVENDOR):
-	GOOS= GOARCH= $(GO) get -u github.com/kardianos/govendor
+	GOOS= GOARCH=$(GOARCH) $(GO) get -u github.com/kardianos/govendor

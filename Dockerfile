@@ -1,5 +1,6 @@
-FROM        quay.io/prometheus/busybox:latest
-LABEL maintainer "The Prometheus Authors <prometheus-developers@googlegroups.com>"
+ARG target
+FROM $target/busybox
+LABEL maintainer="Jesse Stuart <hi@jessestuart.com>"
 
 COPY prometheus                             /bin/prometheus
 COPY promtool                               /bin/promtool
